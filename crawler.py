@@ -26,6 +26,8 @@ class Crawler(object):
                 contents += rets
             if last_date < start_date:
                 break
+
+        contents.sort(reverse=True)
         return contents
 
     def crawl_page(self, start_date, end_date, page=''):
@@ -41,12 +43,13 @@ class Crawler(object):
             last_date (datetime): the smallest date in the page
         """
         full_url = self.base_url + self.rel_url + page
+        time.sleep(0.1)
         res = requests.get(
             full_url,
             headers={'Accept-Language':
                      'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6'}
         ).content.decode()
-        time.sleep(0.1)
+        
         root = etree.HTML(res)
 
         dates = list()
@@ -58,7 +61,7 @@ class Crawler(object):
             date = datetime.strptime(input_date, '%Y-%m-%d')
             if(date <= end_date and date >= start_date):
                 dates.append(input_date)
-                titles.append(root.xpath(cur_xpath + "td[2]/a")[0].text)
+                titles.append("\"" + root.xpath(cur_xpath + "td[2]/a")[0].text + "\"")
                 rel_urls.append(root.xpath(cur_xpath + "td[2]/a/@href")[0])
 
         last_path = "/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr[10]/td[1]"
@@ -81,21 +84,24 @@ class Crawler(object):
         then you are to crawl contents of
         ``Title : 我與DeepMind的A.I.研究之路, My A.I. Journey with DeepMind Date : 2019-12-27 2:20pm-3:30pm Location : R103, CSIE Speaker : 黃士傑博士, DeepMind Hosted by : Prof. Shou-De Lin Abstract: 我將與同學們分享，我博士班研究到加入DeepMind所參與的projects (AlphaGo, AlphaStar與AlphaZero)，以及從我個人與DeepMind的視角對未來AI發展的展望。 Biography: 黃士傑, Aja Huang 台灣人，國立臺灣師範大學資訊工程研究所博士，現為DeepMind Staff Research Scientist。``
         """
+        time.sleep(0.1)
         res = requests.get(
             url,
             headers={'Accept-Language':
                      'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6'}
         ).content.decode()
-        time.sleep(0.1)
+        
         root = etree.HTML(res)
         texts = root.xpath("/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]//text()")
 
         contents = str()
         for text in texts:
             content = str(text).replace("\r","")
-            content = content.replace("\n"," ")
+            content = content.replace("\n"," ")  ###
             content = content.replace("\xa0","")
-            contents+=content
+            content = content.replace("\"","\"\"")
+            contents += content
+        contents = "\"" + contents + "\""
         return contents
 
         raise NotImplementedError
