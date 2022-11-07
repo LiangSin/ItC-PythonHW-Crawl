@@ -88,7 +88,14 @@ class Crawler(object):
         ).content.decode()
         time.sleep(0.1)
         root = etree.HTML(res)
-        text = root.xpath("/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]")
-        return text
+        texts = root.xpath("/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]//text()")
+
+        contents = str()
+        for text in texts:
+            content = str(text).replace("\r","")
+            content = content.replace("\n"," ")
+            content = content.replace("\xa0","")
+            contents+=content
+        return contents
 
         raise NotImplementedError
