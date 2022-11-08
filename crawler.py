@@ -61,7 +61,7 @@ class Crawler(object):
             date = datetime.strptime(input_date, '%Y-%m-%d')
             if(date <= end_date and date >= start_date):
                 dates.append(input_date)
-                titles.append("\"" + root.xpath(cur_xpath + "td[2]/a")[0].text + "\"")
+                titles.append(root.xpath(cur_xpath + "td[2]/a")[0].text)
                 rel_urls.append(root.xpath(cur_xpath + "td[2]/a/@href")[0])
 
         last_path = "/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr[10]/td[1]"
@@ -96,12 +96,7 @@ class Crawler(object):
 
         contents = str()
         for text in texts:
-            content = str(text).replace("\r","")
-            content = content.replace("\n"," ")  ###
-            content = content.replace("\xa0","")
-            content = content.replace("\"","\"\"")
-            contents += content
-        contents = "\"" + contents + "\""
+            contents += str(text).replace("\xa0"," ")
         return contents
 
         raise NotImplementedError
